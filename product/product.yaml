@@ -1,0 +1,13 @@
+_ > nanoagent.plugin.v0001.ProductConfig:
+tagline: "Work out a hidden rule from examples and write the regex for it"
+summary: "Each case is an invented string format with no name to look up: a handful of accepted strings, and rejected ones that each break a single part of the rule. Pick a case and the agent reads the examples, works out what the rule requires, and writes a regular expression for it. The pattern is then judged on examples it was never shown."
+highlights:
+  - "The formats are invented, so the rule has to be inferred rather than recalled"
+  - "Every rejected example is a near miss, breaking exactly one part of the rule"
+  - "The pattern is graded on held-out examples, so listing the strings you saw will not pass"
+  - "Runs offline: no network, no files, nothing to set up"
+steps:
+  - "Pick a case: widget-code, shelf-tag, batch-ref or seat-label"
+  - "The agent reads its labelled examples and compares the near misses against the accepted strings"
+  - "It drafts a pattern and tests it against those examples, refining until all of them are right"
+  - "The pattern is scored on the held-out examples, and the card shows any it got wrong"

@@ -1,0 +1,38 @@
+_ > nanoagent.plugin.v0001.ManifestConfig:
+id: regex-infer
+name: Regex From Examples
+version: 0.1.0
+status: ready
+spec: nanoagent.plugin/v0001
+
+runtime > nanoagent.plugin.v0001.RuntimeConfig:
+  type: mcp_stdio
+  command: [uv, run, --frozen, python, -m, plugin]
+
+permissions > nanoagent.plugin.v0001.PermissionsConfig:
+  network > nanoagent.plugin.v0001.NetworkConfig:
+    hosts: []
+  filesystem > nanoagent.plugin.v0001.FilesystemConfig:
+    write: [workspace]
+
+# One entry per contract.Tool; its input and output classes are contract.TOOLS's.
+tools > dict[contract.Tool, nanoagent.plugin.v0001.ToolConfig]:
+  sample_examples:
+    description: Read a case's visible labelled examples, accepted strings first
+  try_pattern:
+    description: Run a candidate pattern over a case's visible examples and report the ones it labels wrongly
+  holdout_examples:
+    description: Read a case's held-out labelled examples, which no task tool returns
+
+# One entry per contract.Task; its input and output classes are contract.TASKS's.
+tasks > dict[contract.Task, nanoagent.plugin.v0001.TaskConfig]:
+  infer-pattern:
+    description: Infer a case's hidden rule from labelled examples and write a regular expression for it
+    runner: agent
+    tools: [sample_examples, try_pattern]
+    reference: holdout_examples
+    instructions: |-
+      The case names a hidden rule that accepts some strings and rejects others. Read its labelled examples with sample_examples: every rejected example is a near miss that breaks one part of the rule, so compare them against the accepted ones to work out what the rule requires.
+      Write a Python regular expression for that rule. It is matched whole with re.fullmatch, so it must describe the entire string and needs no anchors.
+      Check it with try_pattern and keep refining while anything is wrong. try_pattern reports only on the examples you have already seen.
+      Submit the case as the task gave it, and the pattern. The pattern is judged on held-out examples you are never shown, so describe the rule rather than listing the strings you were given: a pattern that spells those out will fail on the held-out ones.
